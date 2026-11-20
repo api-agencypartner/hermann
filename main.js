@@ -50,7 +50,7 @@ const cards = $$('.card'); cards.forEach((c, i) => c.style.setProperty('--i', i)
 
 /* tracker + scroll-linked */
 
-const svc = $('#services'), journey = $('#journey'), track = $('.journey__track'), legs = $$('.leg'), jFill = $('#jFill'), jClock = $('#jClock'), jPlace = $('#jPlace');
+const svc = $('#services'), journey = $('#journey') || document.createElement('div'), track = $('.journey__track') || document.createElement('div'), legs = $$('.leg'), jFill = $('#jFill') || document.createElement('i'), jClock = $('#jClock'), jPlace = $('#jPlace');
 const ind = $('#industries'), endZone = $('#locations');
 let stage = -1;
 const setStage = () => {};
@@ -75,7 +75,7 @@ const onScroll = y => {
     jFill.style.transform = `scaleX(${jp})`;
     legs.forEach(l => { const r = l.getBoundingClientRect(); l.querySelector('img').style.transform = `scale(1.1) translateX(${((r.left + r.width / 2) / innerWidth - .5) * -36}px)`; });
     const k = Math.min(legs.length - 1, Math.floor(jp * legs.length * .999));
-    if (k !== curLeg) { curLeg = k; jClock.textContent = legs[k].dataset.t; jPlace.textContent = legs[k].dataset.p; }
+    if (legs.length && k !== curLeg) { curLeg = k; jClock.textContent = legs[k].dataset.t; jPlace.textContent = legs[k].dataset.p; }
     // stacked cards: earlier cards shrink slightly as the next covers them
     cards.forEach((c, i) => { const n = cards[i + 1]; if (!n) return; const nr = n.getBoundingClientRect(), cr = c.getBoundingClientRect(); const p = clamp(1 - (nr.top - cr.top) / cr.height); c.style.transform = `scale(${1 - p * .05})`; c.style.filter = `brightness(${1 - p * .25})`; });
   }
