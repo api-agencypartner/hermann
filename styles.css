@@ -506,3 +506,6 @@ fieldset{border:0;margin:0;padding:0}legend{font-size:14px;font-weight:500;margi
 .nav.solid .nav__portal:hover,.nav.open .nav__portal:hover{background:rgba(0,0,0,.05)}
 
 .nav__portal{display:flex;align-items:center;margin:0}
+.nav__tel,.nav__cta{height:48px;min-height:48px;box-sizing:border-box}
+.nav__tel{padding:0 20px 0 6px}
+.nav__tel .ic{width:36px;height:36px;padding:9px}
