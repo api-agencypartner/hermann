@@ -49,11 +49,11 @@ $$('.fade').forEach(f => { const im = $$('img', f); let i = 0, t; const step = (
 const cards = $$('.card'); cards.forEach((c, i) => c.style.setProperty('--i', i));
 
 /* tracker + scroll-linked */
-const tracker = $('#tracker'), tsteps = $$('.tracker__steps li'), tstat = $('#trkStatus'), labels = ['Booked', 'At port', 'In transit', 'Stored', 'Delivered'];
+
 const svc = $('#services'), journey = $('#journey'), track = $('.journey__track'), legs = $$('.leg'), jFill = $('#jFill'), jClock = $('#jClock'), jPlace = $('#jPlace');
 const ind = $('#industries'), endZone = $('#locations');
 let stage = -1;
-const setStage = s => { if (s === stage) return; stage = s; tsteps.forEach((li, k) => { li.classList.toggle('done', k < s); li.classList.toggle('on', k === s); }); tstat.textContent = labels[s]; };
+const setStage = () => {};
 let curLeg = -1;
 const onScroll = y => {
   nav.classList.toggle('solid', y > hero.offsetHeight - 80);
@@ -62,7 +62,7 @@ const onScroll = y => {
   const vh = innerHeight;
   // tracker visibility: from services to the start of locations
   const show = svc.getBoundingClientRect().top < vh * .6 && endZone.getBoundingClientRect().top > vh * .5;
-  tracker.classList.toggle('show', show);
+  
   // stage
   const jr = journey.getBoundingClientRect(), span = journey.offsetHeight - vh, jp = clamp(-jr.top / span);
   if (jr.top > vh * .3) setStage(0);
@@ -182,6 +182,17 @@ form.addEventListener('submit', e => {
     b.addEventListener('mouseenter', () => { b.style.setProperty('--bw', b.offsetWidth + 'px'); b.classList.remove('drive-out'); void b.offsetWidth; b.classList.add('drive-in'); });
     b.addEventListener('mouseleave', () => { b.classList.remove('drive-in'); void b.offsetWidth; b.classList.add('drive-out'); });
     b.addEventListener('animationend', e => { if (e.animationName === 'tout') b.classList.remove('drive-out'); });
+  });
+}
+
+/* fill reveal: words light up as the paragraph scrolls through */
+{
+  $$('.fill').forEach(el => {
+    const walk = n => [...n.childNodes].forEach(c => { if (c.nodeType === 3) { const f = document.createDocumentFragment(); c.textContent.split(/(\s+)/).forEach(w => { if (!w) return; if (/^\s+$/.test(w)) f.append(w); else { const s = document.createElement('span'); s.className = 'fw'; s.textContent = w; f.append(s); } }); c.replaceWith(f); } else if (c.nodeType === 1) walk(c); });
+    walk(el);
+    const ws = $$('.fw', el), hl = $('.hl', el);
+    const tick = () => { const r = el.getBoundingClientRect(), p = clamp((innerHeight * .85 - r.top) / (r.height + innerHeight * .35)); const n = Math.round(p * ws.length); ws.forEach((w, i) => w.classList.toggle('lit', RM || i < n)); if (hl) hl.classList.toggle('lit', RM || hl.querySelector('.fw:last-child').classList.contains('lit')); };
+    if (lenis) lenis.on('scroll', tick); else addEventListener('scroll', tick, { passive: true }); tick();
   });
 }
 }
