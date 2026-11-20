@@ -83,18 +83,24 @@ const onScroll = y => {
 if (lenis) lenis.on('scroll', e => onScroll(e.scroll)); else addEventListener('scroll', () => onScroll(scrollY), { passive: true });
 addEventListener('resize', () => onScroll(scrollY)); onScroll(scrollY);
 
-/* industries: floating image follows the cursor (photos load from assets/ind/<key>.jpg) */
+/* industries: floating image follows the cursor, crossfades between rows */
 {
-  const fl = $('#ifloat'), fimg = $('img', fl), have = {};
-  $$('#ilist li').forEach(li => { const src = `assets/ind/${li.dataset.img}.jpg`, test = new Image(); test.onload = () => have[li.dataset.img] = src; test.src = src; });
-  let x = 0, y = 0, tx = 0, ty = 0, raf = 0;
-  const loop = () => { x += (tx - x) * .14; y += (ty - y) * .14; fl.style.transform = `translate(${x - 150}px,${y - 112}px) scale(1)`; raf = requestAnimationFrame(loop); };
+  const fl = $('#ifloat'), list = $('#ilist'), imgs = {};
+  fl.innerHTML = '';
+  $$('#ilist li').forEach(li => { const k = li.dataset.img, im = new Image(); im.alt = ''; im.decoding = 'async'; im.onload = () => { imgs[k] = im; fl.appendChild(im); }; im.src = `assets/ind/${k}.jpg`; });
+  let x = 0, y = 0, tx = 0, ty = 0, raf = 0, inside = false, cur = null;
+  const loop = () => {
+    x += (tx - x) * .12; y += (ty - y) * .12;
+    fl.style.transform = `translate3d(${x - 150}px,${y - 112}px,0)`;
+    raf = (inside || Math.abs(tx - x) + Math.abs(ty - y) > .5) ? requestAnimationFrame(loop) : 0;
+  };
+  const show = k => { if (k === cur) return; cur = k; Object.entries(imgs).forEach(([n, im]) => im.classList.toggle('on', n === k)); };
   if (hover && !RM) {
-    $$('#ilist li').forEach(li => {
-      li.addEventListener('mouseenter', e => { const s = have[li.dataset.img]; if (!s) return; fimg.src = s; tx = x = e.clientX; ty = y = e.clientY; fl.classList.add('on'); if (!raf) raf = requestAnimationFrame(loop); });
-      li.addEventListener('mouseleave', () => { fl.classList.remove('on'); cancelAnimationFrame(raf); raf = 0; });
-      li.addEventListener('mousemove', e => { tx = e.clientX + 170; ty = e.clientY; });
-    });
+    list.addEventListener('mouseenter', e => { inside = true; tx = x = e.clientX + 170; ty = y = e.clientY; fl.classList.add('on'); if (!raf) raf = requestAnimationFrame(loop); });
+    list.addEventListener('mouseleave', () => { inside = false; fl.classList.remove('on'); });
+    list.addEventListener('mousemove', e => { tx = e.clientX + 170; ty = e.clientY; if (!raf) raf = requestAnimationFrame(loop); });
+    $$('#ilist li').forEach(li => li.addEventListener('mouseenter', () => show(li.dataset.img)));
+    addEventListener('scroll', () => { if (inside) fl.classList.add('on'); }, { passive: true });
   }
 }
 
