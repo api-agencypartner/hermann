@@ -504,4 +504,5 @@ fieldset{border:0;margin:0;padding:0}legend{font-size:14px;font-weight:500;margi
 .nav__portal{font-size:15px;font-weight:400;opacity:1;padding:12px 14px;margin-right:0;border-radius:999px;transition:background .3s}
 .nav__portal:hover{text-decoration:none;background:rgba(255,255,255,.12)}
 .nav.solid .nav__portal:hover,.nav.open .nav__portal:hover{background:rgba(0,0,0,.05)}
-.nav__portal:first-of-type{margin-left:auto}.nav__tel{margin-left:8px}@media (max-width:1100px){.nav__tel{margin-left:auto}}
+
+.nav__portal{display:flex;align-items:center;margin:0}
